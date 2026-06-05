@@ -1,0 +1,65 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+.output
+.vinxi
+.tanstack/**
+.nitro
+*.local
+
+# Wrangler / Cloudflare
+.wrangler/
+.dev.vars
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Python virtual environment
+overlay_env/
+__pycache__/
+*.pyc
+*.pyo
+
+# YOLO model weights (large binary files)
+*.pt
+*.pth
+*.onnx
+*.weights
+
+# Backend temp/output data
+backend/temp/
+backend/outputs/
+backend/runs/
+backend/logs/
+backend/uploads/
+backend/dataset/
+backend/pip_cache/
+backend/__pycache__/
+
+# Dataset and large archives
+dataset/
+dataset.zip
+outputs/
+temp/
+
+# Environment variables
+.env
+.env.local
+.env.production
