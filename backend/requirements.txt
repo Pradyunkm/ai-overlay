@@ -16,3 +16,6 @@ scipy==1.17.1
 matplotlib==3.10.9
 pandas==3.0.3
 psutil==7.2.2
+fpdf2==2.8.3
+pynvml==11.5.0
+websockets==13.1

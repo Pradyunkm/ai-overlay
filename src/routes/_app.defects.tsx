@@ -1,16 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Panel, PageHeader, Badge } from "@/components/layout/AppShell";
 import { HeatmapBlob, FeatureMaps, WaferGrid } from "@/components/viz/WaferMap";
-import { DonutChart, LiveLine, genTime } from "@/components/viz/Charts";
+import { DonutChart, LiveLine } from "@/components/viz/Charts";
 import { AlertTriangle, TrendingDown, ShieldAlert, Eye, Filter } from "lucide-react";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from "recharts";
+import { useState, useEffect } from "react";
+import { fetchDefectsAnalytics, type DefectsAnalytics } from "@/lib/api/backend";
 
 export const Route = createFileRoute("/_app/defects")({
   head: () => ({ meta: [{ title: "Defect Analytics — SDF" }] }),
   component: Defects,
 });
 
-const classes = [
+const DEFAULT_CLASSES = [
   { name: "Overlay Mismatch",      n: 35, pct: 27.3, color: "var(--cyan)" },
   { name: "Edge Deformation",       n: 28, pct: 21.9, color: "var(--warning)" },
   { name: "Pattern Distortion",     n: 22, pct: 17.2, color: "var(--violet)" },
@@ -19,14 +21,12 @@ const classes = [
   { name: "Others",                 n: 10, pct: 7.8,  color: "oklch(0.55 0.05 240)" },
 ];
 
-const severityDist = [
+const DEFAULT_SEVERITY = [
   { name: "Critical", value: 15, color: "var(--critical)" },
   { name: "High",     value: 28, color: "var(--warning)" },
   { name: "Medium",   value: 45, color: "var(--violet)" },
   { name: "Low",      value: 40, color: "var(--cyan)" },
 ];
-
-const barData = classes.map((c) => ({ name: c.name.split(" ")[0], count: c.n, color: c.color }));
 
 const tipStyle = {
   background: "oklch(0.18 0.04 260 / 0.95)",
@@ -35,6 +35,20 @@ const tipStyle = {
 };
 
 function Defects() {
+  const [data, setData] = useState<DefectsAnalytics | null>(null);
+
+  useEffect(() => {
+    fetchDefectsAnalytics().then(setData).catch(console.error);
+    const id = setInterval(() => fetchDefectsAnalytics().then(setData).catch(console.error), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const classes      = data?.classes?.length      ? data.classes      : DEFAULT_CLASSES;
+  const severityDist = data?.severity_dist?.length ? data.severity_dist : DEFAULT_SEVERITY;
+  const totalDefects = data?.total_defects ?? 128;
+  const barData      = classes.map((c) => ({ name: c.name.split(" ")[0], count: c.n, color: c.color }));
+  const trendData    = data?.trend?.length ? data.trend : [];
+
   return (
     <>
       <PageHeader title="Defect Analytics" crumbs={["Home", "Defect Analytics"]} />
@@ -42,10 +56,10 @@ function Defects() {
       {/* ── Top KPI strip ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {[
-          { label: "Total Defects",    value: "128",  sub: "Live count",        tone: "cyan",    icon: AlertTriangle },
-          { label: "Critical",         value: "15",   sub: "Immediate action",  tone: "critical", icon: ShieldAlert },
-          { label: "Defect Rate",      value: "1.35%",sub: "Per wafer average", tone: "warning",  icon: TrendingDown },
-          { label: "Inspected Today",  value: "2,451",sub: "Wafers processed",  tone: "neon",     icon: Eye },
+          { label: "Total Defects",   value: String(totalDefects), sub: "Live count",        tone: "cyan",    icon: AlertTriangle },
+          { label: "Critical",        value: String(severityDist.find(s => s.name === "Critical")?.value ?? 15), sub: "Immediate action",  tone: "critical", icon: ShieldAlert },
+          { label: "Defect Rate",     value: `${(totalDefects / 10000 * 100).toFixed(2)}%`,     sub: "Per wafer average", tone: "warning",  icon: TrendingDown },
+          { label: "Inspected Today", value: "2,451",                                           sub: "Wafers processed",  tone: "neon",     icon: Eye },
         ].map((k) => {
           const color = k.tone === "neon" ? "var(--neon)" : k.tone === "warning" ? "var(--warning)" : k.tone === "critical" ? "var(--critical)" : "var(--cyan)";
           const Icon = k.icon;
@@ -69,7 +83,7 @@ function Defects() {
 
         {/* Classification bars */}
         <Panel title="Defect Classification" className="col-span-12 lg:col-span-4"
-          action={<span className="flex items-center gap-1.5 sub-text text-muted-foreground"><Filter className="size-3" /> 6 types</span>}>
+          action={<span className="flex items-center gap-1.5 sub-text text-muted-foreground"><Filter className="size-3" /> {classes.length} types</span>}>
           <ul className="space-y-3">
             {classes.map((c) => (
               <li key={c.name}>
@@ -110,7 +124,7 @@ function Defects() {
               <DonutChart data={severityDist} />
               <div className="absolute inset-0 grid place-items-center pointer-events-none">
                 <div className="text-center">
-                  <div className="text-2xl font-bold" style={{ color: "var(--cyan)", fontFamily: "Inter, sans-serif" }}>128</div>
+                  <div className="text-2xl font-bold" style={{ color: "var(--cyan)", fontFamily: "Inter, sans-serif" }}>{totalDefects}</div>
                   <div className="sub-text text-muted-foreground">Total</div>
                 </div>
               </div>
@@ -145,13 +159,13 @@ function Defects() {
           <FeatureMaps />
         </Panel>
 
-        <Panel title="Live Defect Trend" subtitle="Rolling 60-minute window" className="col-span-12 lg:col-span-4"
+        <Panel title="Live Defect Trend" subtitle="Rolling 14-day window" className="col-span-12 lg:col-span-4"
           action={<Badge label="Live" tone="neon" pulse />}>
           <div className="flex items-baseline gap-2 mb-3">
-            <span className="text-4xl font-bold" style={{ color: "var(--cyan)", fontFamily: "Inter, sans-serif" }}>128</span>
-            <span className="sub-text text-muted-foreground">defects / min</span>
+            <span className="text-4xl font-bold" style={{ color: "var(--cyan)", fontFamily: "Inter, sans-serif" }}>{totalDefects}</span>
+            <span className="sub-text text-muted-foreground">total defects</span>
           </div>
-          <LiveLine data={genTime(14, 130, 50)} color="var(--cyan)" height={140} />
+          <LiveLine data={trendData.length ? trendData : Array.from({ length: 14 }, (_, i) => ({ t: `D-${i}`, v: Math.round(100 + Math.sin(i) * 30) }))} color="var(--cyan)" height={140} />
         </Panel>
       </div>
     </>

@@ -22,7 +22,7 @@ def detect_overlay(input_image_path):
     image = cv2.imread(input_image_path)
 
     # Run AI inference
-    results = model(input_image_path)
+    results = model(input_image_path, conf=0.001)
 
     detections = []
 

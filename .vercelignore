@@ -1,0 +1,25 @@
+# Vercel Ignore File
+
+# Ignored folders
+node_modules/
+.git/
+.vercel/
+.tanstack/
+.vinxi/
+.output/
+.nitro/
+
+# Python backend and environment
+backend/
+overlay_env/
+yolo11s.pt
+yolo11m.pt
+yolo26n.pt
+
+# Datasets and local temporary directories
+dataset/
+dataset.zip
+outputs/
+temp/
+notebooks/
+models/

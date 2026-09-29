@@ -17,7 +17,6 @@ import { Route as AppSystemRouteImport } from './routes/_app.system'
 import { Route as AppStepsRouteImport } from './routes/_app.steps'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppReportsRouteImport } from './routes/_app.reports'
-import { Route as AppRecommendationsRouteImport } from './routes/_app.recommendations'
 import { Route as AppProcessRouteImport } from './routes/_app.process'
 import { Route as AppPredictiveRouteImport } from './routes/_app.predictive'
 import { Route as AppOverlayRouteImport } from './routes/_app.overlay'
@@ -62,11 +61,6 @@ const AppReportsRoute = AppReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRecommendationsRoute = AppRecommendationsRouteImport.update({
-  id: '/recommendations',
-  path: '/recommendations',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppProcessRoute = AppProcessRouteImport.update({
   id: '/process',
   path: '/process',
@@ -94,7 +88,6 @@ export interface FileRoutesByFullPath {
   '/overlay': typeof AppOverlayRoute
   '/predictive': typeof AppPredictiveRoute
   '/process': typeof AppProcessRoute
-  '/recommendations': typeof AppRecommendationsRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
   '/steps': typeof AppStepsRoute
@@ -107,7 +100,6 @@ export interface FileRoutesByTo {
   '/overlay': typeof AppOverlayRoute
   '/predictive': typeof AppPredictiveRoute
   '/process': typeof AppProcessRoute
-  '/recommendations': typeof AppRecommendationsRoute
   '/reports': typeof AppReportsRoute
   '/settings': typeof AppSettingsRoute
   '/steps': typeof AppStepsRoute
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   '/_app/overlay': typeof AppOverlayRoute
   '/_app/predictive': typeof AppPredictiveRoute
   '/_app/process': typeof AppProcessRoute
-  '/_app/recommendations': typeof AppRecommendationsRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/steps': typeof AppStepsRoute
@@ -140,7 +131,6 @@ export interface FileRouteTypes {
     | '/overlay'
     | '/predictive'
     | '/process'
-    | '/recommendations'
     | '/reports'
     | '/settings'
     | '/steps'
@@ -153,7 +143,6 @@ export interface FileRouteTypes {
     | '/overlay'
     | '/predictive'
     | '/process'
-    | '/recommendations'
     | '/reports'
     | '/settings'
     | '/steps'
@@ -168,7 +157,6 @@ export interface FileRouteTypes {
     | '/_app/overlay'
     | '/_app/predictive'
     | '/_app/process'
-    | '/_app/recommendations'
     | '/_app/reports'
     | '/_app/settings'
     | '/_app/steps'
@@ -240,13 +228,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/recommendations': {
-      id: '/_app/recommendations'
-      path: '/recommendations'
-      fullPath: '/recommendations'
-      preLoaderRoute: typeof AppRecommendationsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/process': {
       id: '/_app/process'
       path: '/process'
@@ -283,7 +264,6 @@ interface AppRouteChildren {
   AppOverlayRoute: typeof AppOverlayRoute
   AppPredictiveRoute: typeof AppPredictiveRoute
   AppProcessRoute: typeof AppProcessRoute
-  AppRecommendationsRoute: typeof AppRecommendationsRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStepsRoute: typeof AppStepsRoute
@@ -298,7 +278,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppOverlayRoute: AppOverlayRoute,
   AppPredictiveRoute: AppPredictiveRoute,
   AppProcessRoute: AppProcessRoute,
-  AppRecommendationsRoute: AppRecommendationsRoute,
   AppReportsRoute: AppReportsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStepsRoute: AppStepsRoute,

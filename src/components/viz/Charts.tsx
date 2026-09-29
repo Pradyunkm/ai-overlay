@@ -42,11 +42,11 @@ export function LiveLine({ data, color = "var(--cyan)", height = 200 }: { data: 
   );
 }
 
-export function DonutChart({ data }: { data: { name: string; value: number; color: string }[] }) {
+export function DonutChart({ data, innerRadius = 28, outerRadius = 38 }: { data: { name: string; value: number; color: string }[]; innerRadius?: number; outerRadius?: number }) {
   return (
-    <ResponsiveContainer width="100%" height={200}>
+    <ResponsiveContainer width="100%" height="100%">
       <PieChart>
-        <Pie data={data} dataKey="value" innerRadius={55} outerRadius={85} paddingAngle={2} stroke="none">
+        <Pie data={data} dataKey="value" innerRadius={innerRadius} outerRadius={outerRadius} paddingAngle={2} stroke="none">
           {data.map((d, i) => <Cell key={i} fill={d.color} />)}
         </Pie>
         <Tooltip contentStyle={tooltipStyle} />

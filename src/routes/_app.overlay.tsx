@@ -1,22 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Panel, PageHeader, Badge } from "@/components/layout/AppShell";
 import { WaferGrid } from "@/components/viz/WaferMap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { fetchOverlayAnalysis, type OverlayAnalysis } from "@/lib/api/backend";
 
 export const Route = createFileRoute("/_app/overlay")({
   head: () => ({ meta: [{ title: "Overlay Analysis — SDF" }] }),
   component: OverlayAnalysis,
 });
 
-const metrics = [
-  { label: "Overlay Shift", value: "4.06", unit: "nm", tone: "cyan" },
-  { label: "Rotational Misalignment", value: "0.23", unit: "°", tone: "warning" },
-  { label: "Edge Placement Error", value: "3.12", unit: "nm", tone: "violet" },
-  { label: "Alignment Confidence", value: "97.6", unit: "%", tone: "neon" },
-];
-
 function OverlayAnalysis() {
   const [pos, setPos] = useState(50);
+  const [data, setData] = useState<OverlayAnalysis | null>(null);
+
+  useEffect(() => {
+    fetchOverlayAnalysis().then(setData).catch(console.error);
+  }, []);
+
+  const metrics = [
+    { label: "Overlay Shift",           value: data ? data.overlay_shift.toFixed(2)          : "4.06", unit: "nm", tone: "cyan" },
+    { label: "Rotational Misalignment", value: data ? data.rotation_misalignment.toFixed(3)  : "0.23", unit: "°",  tone: "warning" },
+    { label: "Edge Placement Error",    value: data ? data.edge_placement_error.toFixed(2)    : "3.12", unit: "nm", tone: "violet" },
+    { label: "Alignment Confidence",    value: data ? data.alignment_confidence.toFixed(1)    : "97.6", unit: "%",  tone: "neon" },
+  ];
+
   return (
     <>
       <PageHeader title="Overlay Analysis" crumbs={["Home", "Overlay Analysis"]} />
@@ -54,7 +61,7 @@ function OverlayAnalysis() {
           <input type="range" min={0} max={100} value={pos} onChange={(e) => setPos(+e.target.value)} className="w-full mt-3 accent-[color:var(--cyan)]" />
         </Panel>
 
-        <Panel title="Overlay Difference" className="col-span-12 lg:col-span-5" action={<Badge label="Δ 10.0 max" tone="warning" />}>
+        <Panel title="Overlay Difference" className="col-span-12 lg:col-span-5" action={<Badge label={data ? `Δ ${data.overlay_shift.toFixed(2)} nm` : "Δ 10.0 max"} tone="warning" />}>
           <div className="relative aspect-square max-w-[420px] mx-auto rounded-lg overflow-hidden">
             <svg viewBox="0 0 400 400" className="w-full h-full">
               <defs>
