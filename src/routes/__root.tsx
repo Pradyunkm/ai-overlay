@@ -97,6 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 import { Toaster } from "../components/ui/sonner";
+import { Analytics } from "@vercel/analytics/react";
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
@@ -107,6 +108,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <body className="dark">
         {children}
         <Toaster />
+        <Analytics />
         <Scripts />
       </body>
     </html>
